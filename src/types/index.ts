@@ -1,4 +1,4 @@
-export type ModuleId = 'subscription-design' | 'compute-selection'
+export type ModuleId = 'subscription-design' | 'compute-selection' | 'landing-zone' | 'policy-governance'
 
 export interface Option {
   value: string

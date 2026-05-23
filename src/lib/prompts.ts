@@ -59,9 +59,10 @@ Respond with JSON in this exact schema:
     }
   }
 
-  return {
-    system: systemPrompt,
-    user: `Based on the following workload assessment, recommend the most appropriate Azure compute service from: Azure Kubernetes Service (AKS), Azure Container Apps (ACA), Azure App Service, or Azure Functions.
+  if (moduleId === 'compute-selection') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following workload assessment, recommend the most appropriate Azure compute service from: Azure Kubernetes Service (AKS), Azure Container Apps (ACA), Azure App Service, or Azure Functions.
 
 ASSESSMENT ANSWERS:
 ${formattedAnswers}
@@ -86,6 +87,72 @@ Respond with JSON in this exact schema:
   "risks": [
     "Risk 1 specific to this service choice and their context, with mitigation",
     "Risk 2 with mitigation"
+  ]
+}`
+    }
+  }
+
+  if (moduleId === 'landing-zone') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following organisational assessment, recommend the most appropriate Azure Landing Zone pattern and reference implementation.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line pattern recommendation (e.g., 'Azure Landing Zone — Enterprise-Scale with Terraform ALZ module')",
+  "recommendation": "2-4 paragraphs. Name the exact CAF pattern (Start Small and Expand / Enterprise-Scale ALZ / Sovereign Landing Zone / ALZ for Small Enterprises). Describe the specific reference implementation to use (ALZ-Bicep / ALZ Terraform module / Azure Landing Zone portal accelerator). Be concrete about the management group structure, what goes in platform vs landing zone subscriptions, and which IaC repository to fork.",
+  "rationale": "2-3 sentences explaining why this specific pattern fits their maturity, team size, compliance needs, and timeline.",
+  "tradeoffs": [
+    "What they give up vs a simpler pattern",
+    "What they give up vs a more complex pattern",
+    "An operational reality of this choice given their team size"
+  ],
+  "nextSteps": [
+    "First concrete action — specific GitHub repo URL or portal accelerator link to start from",
+    "Second action — e.g., what to configure before deploying",
+    "Third action — first workload to onboard after platform is ready",
+    "Fourth action — first governance review milestone"
+  ],
+  "costRange": "Realistic platform subscription cost range (e.g., 'Platform subscriptions cost ~$300–$800/month for connectivity + identity; management groups and policy are free')",
+  "risks": [
+    "Risk 1 specific to this pattern and their team size, with mitigation",
+    "Risk 2 with mitigation"
+  ]
+}`
+    }
+  }
+
+  // policy-governance
+  return {
+    system: systemPrompt,
+    user: `Based on the following assessment, recommend a concrete Azure Policy and governance strategy — covering which built-in initiatives to assign, where in the management group hierarchy, and how strictly to enforce them.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line summary (e.g., 'CIS Benchmark + tagging policy in Audit mode with 90-day deny rollout')",
+  "recommendation": "2-4 paragraphs. Name the specific Azure Policy initiatives to assign (use exact Microsoft names e.g. 'Azure Security Benchmark', 'CIS Microsoft Azure Foundations Benchmark v2.0.0', 'NIST SP 800-53 Rev 5'). Describe at which management group level each initiative should be assigned, enforcement mode, and any exclusions needed. Include tagging policy, region restriction, and identity policies specific to their answers.",
+  "rationale": "2-3 sentences explaining why this policy set matches their compliance framework, enforcement preference, and team maturity.",
+  "tradeoffs": [
+    "Impact on developer velocity from policy enforcement",
+    "Compliance coverage gap if any initiative is omitted",
+    "Operational overhead of managing this policy set at their team maturity level"
+  ],
+  "nextSteps": [
+    "First concrete action — e.g., 'Assign the Azure Security Benchmark initiative at your root management group in Audit mode using: az policy assignment create ...'",
+    "Second action — remediation tasks to bring existing resources into compliance",
+    "Third action — setting up compliance dashboard in Microsoft Defender for Cloud",
+    "Fourth action — policy review cadence recommendation"
+  ],
+  "costRange": "Azure Policy itself is free. Costs come from: Microsoft Defender for Cloud (CSPM free tier; Defender plans $X/resource/month), Log Analytics ingestion for audit logs (~$2.30/GB), and engineering time for remediation.",
+  "risks": [
+    "Risk 1 — e.g., policy breaking existing deployments with a mitigation strategy",
+    "Risk 2 — compliance drift over time with a mitigation strategy"
   ]
 }`
   }

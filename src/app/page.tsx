@@ -85,20 +85,6 @@ export default function Home() {
             </Link>
           ))}
 
-          {/* Coming soon placeholders */}
-          <div className="bg-slate-800/30 border border-slate-800 border-dashed rounded-2xl p-6 opacity-60">
-            <div className="text-4xl mb-4">🔐</div>
-            <h3 className="text-lg font-bold text-slate-500 mb-2">Azure Policy & Governance</h3>
-            <p className="text-slate-600 text-sm">Which policies to enforce for your compliance requirements.</p>
-            <div className="mt-4 text-slate-600 text-sm">Coming soon</div>
-          </div>
-
-          <div className="bg-slate-800/30 border border-slate-800 border-dashed rounded-2xl p-6 opacity-60">
-            <div className="text-4xl mb-4">🌐</div>
-            <h3 className="text-lg font-bold text-slate-500 mb-2">Landing Zone Pattern Advisor</h3>
-            <p className="text-slate-600 text-sm">Which Azure landing zone reference implementation fits your org.</p>
-            <div className="mt-4 text-slate-600 text-sm">Coming soon</div>
-          </div>
         </div>
       </section>
 
