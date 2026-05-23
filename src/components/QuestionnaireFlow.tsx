@@ -61,8 +61,9 @@ export default function QuestionnaireFlow({ module }: Props) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Request failed')
 
-      const encoded = encodeURIComponent(JSON.stringify(data.recommendation))
-      router.push(`/assess/${module.id}/result?r=${encoded}`)
+      sessionStorage.setItem('recommendation', JSON.stringify(data.recommendation))
+      sessionStorage.setItem('moduleTitle', module.title)
+      router.push(`/assess/${module.id}/result`)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
       setLoading(false)

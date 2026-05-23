@@ -1,26 +1,37 @@
-import { notFound } from 'next/navigation'
-import { getModule } from '@/lib/modules'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import RecommendationOutput from '@/components/RecommendationOutput'
 import { Recommendation } from '@/types'
 
-interface Props {
-  params: Promise<{ module: string }>
-  searchParams: Promise<{ r?: string }>
-}
+export default function ResultPage() {
+  const router = useRouter()
+  const [recommendation, setRecommendation] = useState<Recommendation | null>(null)
+  const [moduleTitle, setModuleTitle] = useState('')
 
-export default async function ResultPage({ params, searchParams }: Props) {
-  const { module: moduleId } = await params
-  const { r } = await searchParams
+  useEffect(() => {
+    const raw = sessionStorage.getItem('recommendation')
+    const title = sessionStorage.getItem('moduleTitle')
+    if (!raw || !title) {
+      router.replace('/')
+      return
+    }
+    try {
+      setRecommendation(JSON.parse(raw))
+      setModuleTitle(title)
+    } catch {
+      router.replace('/')
+    }
+  }, [router])
 
-  const module = getModule(moduleId)
-  if (!module || !r) notFound()
-
-  let recommendation: Recommendation
-  try {
-    recommendation = JSON.parse(decodeURIComponent(r))
-  } catch {
-    notFound()
+  if (!recommendation) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-slate-600 border-t-blue-400 rounded-full animate-spin" />
+      </div>
+    )
   }
 
-  return <RecommendationOutput recommendation={recommendation} moduleTitle={module.title} />
+  return <RecommendationOutput recommendation={recommendation} moduleTitle={moduleTitle} />
 }
