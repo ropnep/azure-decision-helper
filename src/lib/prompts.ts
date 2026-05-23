@@ -125,6 +125,171 @@ Respond with JSON in this exact schema:
     }
   }
 
+  if (moduleId === 'azure-vm') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following assessment, recommend the most appropriate Azure VM series, disk type, availability configuration, and cost optimisation strategy.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line recommendation (e.g., 'Dsv5-series VMs with Premium SSD, Availability Zones, and 3-year Reserved Instances')",
+  "recommendation": "2-4 paragraphs. Name the exact VM series and example SKU (e.g., Standard_D4s_v5). Explain disk configuration (managed disk type, size, caching). Describe availability configuration (single VM / Availability Set / Availability Zones) and why. Include licensing recommendation (PAYG / Reserved Instance / Azure Hybrid Benefit). Be specific — give real SKU names and example pricing.",
+  "rationale": "2-3 sentences explaining why this VM family and configuration fits their stated workload, availability SLA, and commitment model.",
+  "tradeoffs": [
+    "Cost vs performance trade-off of this VM series vs alternatives",
+    "Availability configuration trade-off (e.g., AZ vs Availability Set)",
+    "Reserved Instance commitment risk"
+  ],
+  "nextSteps": [
+    "First action — e.g., 'Deploy via: az vm create --resource-group myRG --name myVM --image Win2022Datacenter --size Standard_D4s_v5 --zone 1'",
+    "Second action — configure backup or ASR",
+    "Third action — purchase Reserved Instance or apply AHUB",
+    "Fourth action — configure monitoring and alerting"
+  ],
+  "costRange": "Realistic monthly cost estimate (e.g., 'Standard_D4s_v5 Windows: ~$280/month PAYG; ~$160/month with 3-year RI + AHUB')",
+  "risks": [
+    "Risk 1 specific to this VM choice with mitigation",
+    "Risk 2 with mitigation"
+  ]
+}`
+    }
+  }
+
+  if (moduleId === 'sql-database') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following assessment, recommend the most appropriate Azure SQL deployment model, service tier, high availability configuration, and cost model.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line recommendation (e.g., 'Azure SQL Database Business Critical — Zone-redundant, 8 vCores, 3-year Reserved Capacity')",
+  "recommendation": "2-4 paragraphs. Specify the deployment model (Single Database / Elastic Pool / SQL Managed Instance / SQL on VM). Name the service tier and vCore count. Describe HA configuration (zone-redundant / geo-replication / failover group). Include connectivity model (private endpoint). Be specific — give real tier names, vCore recommendations, and example costs.",
+  "rationale": "2-3 sentences explaining why this deployment model and tier fits their compatibility needs, database count, IOPS requirements, and HA SLA.",
+  "tradeoffs": [
+    "Feature or compatibility trade-off vs SQL Managed Instance or SQL on VM",
+    "Cost vs resilience trade-off of chosen HA model",
+    "Reserved Capacity commitment risk"
+  ],
+  "nextSteps": [
+    "First action — e.g., create the SQL server and database with correct tier and private endpoint",
+    "Second action — configure backup retention and LTR if needed",
+    "Third action — set up geo-replication or failover group if HA requires it",
+    "Fourth action — run Database Migration Assessment if migrating existing database"
+  ],
+  "costRange": "Realistic monthly cost estimate (e.g., 'General Purpose 4 vCores: ~$370/month PAYG; ~$240/month with 3-year Reserved Capacity + AHUB')",
+  "risks": [
+    "Risk 1 specific to this SQL deployment model with mitigation",
+    "Risk 2 with mitigation"
+  ]
+}`
+    }
+  }
+
+  if (moduleId === 'networking') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following assessment, recommend the right combination of Azure networking services — Azure Firewall, Application Gateway, Azure Load Balancer, and/or Azure Front Door — for this architecture.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line recommendation (e.g., 'Azure Firewall Premium + Application Gateway WAF v2 in hub-and-spoke topology')",
+  "recommendation": "2-4 paragraphs. Be explicit about WHICH services to use and WHY. Describe the topology (where each service sits in the network). Name the specific SKU/tier for each service (e.g., Application Gateway v2 WAF_v2 SKU, Azure Firewall Premium). Explain traffic flow — how a request traverses from internet to backend. Include any services to explicitly NOT use and why.",
+  "rationale": "2-3 sentences explaining why this combination of services matches their traffic type, WAF requirement, backend type, and topology.",
+  "tradeoffs": [
+    "Cost trade-off of this combination vs a simpler approach",
+    "Operational complexity trade-off",
+    "A capability this combination lacks vs an alternative"
+  ],
+  "nextSteps": [
+    "First action — deploy the hub VNet and Firewall/Gateway subnet",
+    "Second action — deploy Azure Firewall or Application Gateway with specific SKU",
+    "Third action — configure rules, WAF policies, or routing tables",
+    "Fourth action — validate traffic flow and enable diagnostic logging"
+  ],
+  "costRange": "Realistic monthly cost estimate (e.g., 'Azure Firewall Premium: ~$1,800/month + data processing; App Gateway WAF v2: ~$300/month base + capacity units')",
+  "risks": [
+    "Risk 1 — e.g., misconfigured Firewall rules blocking legitimate traffic, with mitigation",
+    "Risk 2 with mitigation"
+  ]
+}`
+    }
+  }
+
+  if (moduleId === 'storage-account') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following assessment, recommend the right Azure Storage account configuration — account kind, replication, access tier, performance tier, and lifecycle policy.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line recommendation (e.g., 'General Purpose v2, ZRS, Hot tier with Cool lifecycle after 30 days, private endpoint')",
+  "recommendation": "2-4 paragraphs. Specify the account kind (GPv2 / Block Blob / Azure Files). Name the replication type (LRS/ZRS/GRS/GZRS) and explain why. Describe the access tier strategy (Hot/Cool/Cold/Archive and any lifecycle rules). Include connectivity recommendation (public / private endpoint / service endpoint). Mention any special features to enable (hierarchical namespace for ADLS, immutability, soft delete).",
+  "rationale": "2-3 sentences explaining why this configuration matches their data type, access frequency, durability requirements, and security posture.",
+  "tradeoffs": [
+    "Cost vs durability trade-off of chosen replication",
+    "Access cost vs storage cost trade-off of chosen tier",
+    "Operational complexity of lifecycle rules"
+  ],
+  "nextSteps": [
+    "First action — create the storage account with correct kind, replication, and access tier",
+    "Second action — configure private endpoint or firewall rules",
+    "Third action — enable soft delete and configure lifecycle policy",
+    "Fourth action — set up diagnostic logging and access monitoring"
+  ],
+  "costRange": "Realistic monthly cost estimate based on their stated data volume (e.g., '10 TB GPv2 ZRS Hot: ~$230/month storage + egress costs')",
+  "risks": [
+    "Risk 1 — e.g., accidental public access exposure with mitigation",
+    "Risk 2 — e.g., replication lag for GRS during regional failure, with mitigation"
+  ]
+}`
+    }
+  }
+
+  if (moduleId === 'integration-automation') {
+    return {
+      system: systemPrompt,
+      user: `Based on the following assessment, recommend the most appropriate Azure integration or automation service — Logic Apps, Azure Functions, or Azure Automation Accounts — and the right tier and configuration.
+
+ASSESSMENT ANSWERS:
+${formattedAnswers}
+${contextBlock}
+Respond with JSON in this exact schema:
+{
+  "headline": "One-line verdict (e.g., 'Azure Logic Apps Standard — workflow-based integration with VNet connectivity')",
+  "recommendation": "2-4 paragraphs. Name the specific service AND tier (e.g., Logic Apps Consumption / Logic Apps Standard / Functions Consumption / Functions Premium / Automation Account with Hybrid Worker). Explain the hosting plan and why. Describe how to structure the automation (e.g., parent/child Logic Apps, Durable Functions orchestration, PowerShell runbooks). Be specific about connectors, triggers, or bindings to use.",
+  "rationale": "2-3 sentences explaining why this service wins over the alternatives given their use case, builder skills, execution duration, and scale needs.",
+  "tradeoffs": [
+    "What they give up vs Logic Apps (or Functions if Logic Apps is recommended)",
+    "Cost model trade-off",
+    "A scalability or operational limitation of this choice"
+  ],
+  "nextSteps": [
+    "First concrete action to create the resource with the right configuration",
+    "Second action — connect to first integration target",
+    "Third action — implement error handling and retry policy",
+    "Fourth action — set up monitoring and alerting (Application Insights or Azure Monitor)"
+  ],
+  "costRange": "Realistic monthly cost estimate (e.g., 'Logic Apps Consumption: ~$0.000025/action; typical business workflow with 10K executions/month = ~$5–$50/month')",
+  "risks": [
+    "Risk 1 specific to this service choice with mitigation",
+    "Risk 2 — e.g., vendor lock-in or connector deprecation risk, with mitigation"
+  ]
+}`
+    }
+  }
+
   // policy-governance
   return {
     system: systemPrompt,

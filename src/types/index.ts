@@ -1,4 +1,13 @@
-export type ModuleId = 'subscription-design' | 'compute-selection' | 'landing-zone' | 'policy-governance'
+export type ModuleId =
+  | 'subscription-design'
+  | 'compute-selection'
+  | 'landing-zone'
+  | 'policy-governance'
+  | 'azure-vm'
+  | 'sql-database'
+  | 'networking'
+  | 'storage-account'
+  | 'integration-automation'
 
 export interface Option {
   value: string
