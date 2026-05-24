@@ -63,6 +63,7 @@ export default function QuestionnaireFlow({ module }: Props) {
 
       sessionStorage.setItem('recommendation', JSON.stringify(data.recommendation))
       sessionStorage.setItem('moduleTitle', module.title)
+      sessionStorage.setItem('moduleId', module.id)
       router.push(`/assess/${module.id}/result`)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')

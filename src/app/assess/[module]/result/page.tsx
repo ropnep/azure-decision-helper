@@ -9,17 +9,20 @@ export default function ResultPage() {
   const router = useRouter()
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null)
   const [moduleTitle, setModuleTitle] = useState('')
+  const [moduleId, setModuleId] = useState('')
 
   useEffect(() => {
     const raw = sessionStorage.getItem('recommendation')
     const title = sessionStorage.getItem('moduleTitle')
-    if (!raw || !title) {
+    const id = sessionStorage.getItem('moduleId')
+    if (!raw || !title || !id) {
       router.replace('/')
       return
     }
     try {
       setRecommendation(JSON.parse(raw))
       setModuleTitle(title)
+      setModuleId(id)
     } catch {
       router.replace('/')
     }
@@ -33,5 +36,5 @@ export default function ResultPage() {
     )
   }
 
-  return <RecommendationOutput recommendation={recommendation} moduleTitle={moduleTitle} />
+  return <RecommendationOutput recommendation={recommendation} moduleTitle={moduleTitle} moduleId={moduleId} />
 }
